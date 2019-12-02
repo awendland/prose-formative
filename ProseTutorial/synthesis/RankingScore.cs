@@ -4,6 +4,11 @@ using Microsoft.ProgramSynthesis.AST;
 using System.Text.RegularExpressions;
 using Microsoft.ProgramSynthesis.Features;
 
+/*
+ * PROSE documentation on Witness Functions:
+ *  https://microsoft.github.io/prose/documentation/prose/tutorial/#ranking
+ */
+
 namespace ProseTutorial
 {
     public class RankingScore : Feature<double>

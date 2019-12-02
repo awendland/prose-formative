@@ -6,6 +6,12 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.ProgramSynthesis.Utils;
 
+/*
+ * PROSE documentation on Semantics:
+ *  https://microsoft.github.io/prose/documentation/prose/tutorial/#semantics
+ * and Black-Box Operators:
+ *  https://microsoft.github.io/prose/documentation/prose/usage/#black-box-operators
+ */
 
 namespace ProseTutorial {
     public static class Semantics {

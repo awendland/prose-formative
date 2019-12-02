@@ -9,6 +9,12 @@ using Microsoft.ProgramSynthesis.Rules;
 using Microsoft.ProgramSynthesis.Specifications;
 using Microsoft.ProgramSynthesis.Learning;
 
+/*
+ * PROSE documentation on Witness Functions:
+ *  https://microsoft.github.io/prose/documentation/prose/tutorial/#witness-functions
+ *  https://microsoft.github.io/prose/documentation/prose/backpropagation/
+ */
+
 namespace ProseTutorial {
     public class WitnessFunctions : DomainLearningLogic {
         public WitnessFunctions(Grammar grammar) : base(grammar) { }
