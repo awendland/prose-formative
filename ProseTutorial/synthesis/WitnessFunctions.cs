@@ -30,7 +30,7 @@ namespace ProseTutorial {
                 State inputState = example.Key;
                 var output = example.Value as string;
                 var substrings = new List<string>();
-                for (int i = 1; i <= output.Length; ++i) {
+                for (int i = 1; i <= output.Length - 1; ++i) {
                     substrings.Add(output.Substring(0, i));
                 }
                 result[inputState] = substrings.Cast<object>();

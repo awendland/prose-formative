@@ -7,7 +7,7 @@ language Substring;
 
 @input string v;
 
-@start string program := Substring(v, pos, pos);
+@start string program := v | Substring(v, pos, pos) | Append(program, program);
 
 int pos := AbsPos(v, k) | RelPos(v, rr);
 

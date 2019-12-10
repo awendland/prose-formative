@@ -10,6 +10,9 @@ namespace ProseTutorial
     {
         public RankingScore(Grammar grammar) : base(grammar, "Score") { }
 
+        [FeatureCalculator(nameof(Semantics.Append))]
+        public static double Append(double prefix, double suffix) => prefix * suffix;
+
         [FeatureCalculator(nameof(Semantics.Substring))]
         public static double Substring(double v, double start, double end) => start * end;
 
