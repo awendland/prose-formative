@@ -22,7 +22,7 @@ namespace ProseTutorial {
     new Regex(@"$")  // End of line
 };
 
-        [WitnessFunction(nameof(Semantics.Append), 0, DependsOnParameters = new []{1})]
+        [WitnessFunction(nameof(Semantics.Append), 0)]
         public DisjunctiveExamplesSpec WitnessPrefix(GrammarRule rule, ExampleSpec spec) {
             var result = new Dictionary<State, IEnumerable<object>>();
 
@@ -34,11 +34,12 @@ namespace ProseTutorial {
                     substrings.Add(output.Substring(0, i));
                 }
                 result[inputState] = substrings.Cast<object>();
+                Console.WriteLine("Prefix o: {0}\tp: {1}", output, String.Join(", ", substrings));
             }
             return new DisjunctiveExamplesSpec(result);
         }
 
-        [WitnessFunction(nameof(Semantics.Append), 1)]
+        [WitnessFunction(nameof(Semantics.Append), 1, DependsOnParameters = new []{0})]
         public ExampleSpec WitnessSuffix(GrammarRule rule, ExampleSpec spec, ExampleSpec prefixSpec) {
             var result = new Dictionary<State, object>();
             foreach (var example in spec.Examples) {
@@ -46,6 +47,7 @@ namespace ProseTutorial {
                 var output = example.Value as string;
                 var prefix = (string) prefixSpec.Examples[inputState];
                 result[inputState] = output.Substring(prefix.Length);
+                Console.WriteLine("Suffix o: {2}\tp: {0}\ts: {1}", prefix, output.Substring(prefix.Length), output);
             }
             return new ExampleSpec(result);
         }
