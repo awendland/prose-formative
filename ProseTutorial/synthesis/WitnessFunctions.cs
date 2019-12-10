@@ -22,7 +22,7 @@ namespace ProseTutorial {
     new Regex(@"$")  // End of line
 };
 
-        [WitnessFunction(nameof(Semantics.Append), 0)]
+        [WitnessFunction(nameof(Semantics.Append), 0, DependsOnParameters = new []{1})]
         public DisjunctiveExamplesSpec WitnessPrefix(GrammarRule rule, ExampleSpec spec) {
             var result = new Dictionary<State, IEnumerable<object>>();
 
@@ -38,7 +38,7 @@ namespace ProseTutorial {
             return new DisjunctiveExamplesSpec(result);
         }
 
-        [WitnessFunction(nameof(Semantics.Append), 1, DependsOnParameters = new []{0})]
+        [WitnessFunction(nameof(Semantics.Append), 1)]
         public ExampleSpec WitnessSuffix(GrammarRule rule, ExampleSpec spec, ExampleSpec prefixSpec) {
             var result = new Dictionary<State, object>();
             foreach (var example in spec.Examples) {
