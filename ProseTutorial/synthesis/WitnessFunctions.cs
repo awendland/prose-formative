@@ -26,13 +26,16 @@ namespace ProseTutorial {
         public DisjunctiveExamplesSpec WitnessPrefix(GrammarRule rule, ExampleSpec spec) {
             var result = new Dictionary<State, IEnumerable<object>>();
 
+            Console.WriteLine("[Prefix spec {0}", spec.Examples.Count);
             foreach (var example in spec.Examples) {
                 State inputState = example.Key;
                 var output = example.Value as string;
+                // Console.WriteLine("Prefix for {0}", output);
                 var substrings = new List<string>();
                 for (int i = 1; i <= output.Length - 1; ++i) {
                     substrings.Add(output.Substring(0, i));
                 }
+                if (substrings.Count == 0) return null;
                 result[inputState] = substrings.Cast<object>();
                 Console.WriteLine("Prefix o: {0}\tp: {1}", output, String.Join(", ", substrings));
             }
@@ -42,12 +45,14 @@ namespace ProseTutorial {
         [WitnessFunction(nameof(Semantics.Append), 1, DependsOnParameters = new []{0})]
         public ExampleSpec WitnessSuffix(GrammarRule rule, ExampleSpec spec, ExampleSpec prefixSpec) {
             var result = new Dictionary<State, object>();
+            Console.WriteLine("[Suffix spec {0} startSpec {1}", spec.Examples.Count, prefixSpec.Examples.Count);
             foreach (var example in spec.Examples) {
                 State inputState = example.Key;
                 var output = example.Value as string;
+                // Console.WriteLine("Suffix for {0}", output);
                 var prefix = (string) prefixSpec.Examples[inputState];
                 result[inputState] = output.Substring(prefix.Length);
-                Console.WriteLine("Suffix o: {2}\tp: {0}\ts: {1}", prefix, output.Substring(prefix.Length), output);
+                Console.WriteLine("Suffix o: {0}\tp: {1}\ts: {2}", output, prefix, output.Substring(prefix.Length));
             }
             return new ExampleSpec(result);
         }
@@ -56,6 +61,7 @@ namespace ProseTutorial {
         public DisjunctiveExamplesSpec WitnessStartPosition(GrammarRule rule, ExampleSpec spec) {
             var result = new Dictionary<State, IEnumerable<object>>();
 
+            Console.WriteLine("[Start spec {0}", spec.Examples.Count);
             foreach (var example in spec.Examples) {
                 State inputState = example.Key;
                 var input = inputState[rule.Body[0]] as string;
@@ -68,6 +74,7 @@ namespace ProseTutorial {
 
                 if (occurrences.Count == 0) return null;
                 result[inputState] = occurrences.Cast<object>();
+                Console.WriteLine("Start o: {0}\ti: {1}\ts: {2}", output, input, String.Join(", ", occurrences));
             }
             return new DisjunctiveExamplesSpec(result);
 
@@ -76,11 +83,13 @@ namespace ProseTutorial {
         [WitnessFunction(nameof(Semantics.Substring), 2, DependsOnParameters = new []{1})]
         public ExampleSpec WitnessEndPosition(GrammarRule rule, ExampleSpec spec, ExampleSpec startSpec) {
             var result = new Dictionary<State, object>();
+            Console.WriteLine("[End spec {0} startSpec {1}", spec.Examples.Count, startSpec.Examples.Count);
             foreach (var example in spec.Examples) {
                 State inputState = example.Key;
                 var output = example.Value as string;
                 var start = (int) startSpec.Examples[inputState];
                 result[inputState] = start + output.Length;
+                Console.WriteLine("End o: {0}\ts: {1}\te: {2}", output, start, start + output.Length);
             }
             return new ExampleSpec(result);
         }
