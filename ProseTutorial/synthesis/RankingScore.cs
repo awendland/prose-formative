@@ -10,31 +10,13 @@ namespace ProseTutorial
     {
         public RankingScore(Grammar grammar) : base(grammar, "Score") { }
 
-        [FeatureCalculator(nameof(Semantics.Substring))]
-        public static double Substring(double v, double start, double end) => start * end;
-
         [FeatureCalculator(nameof(Semantics.Kth))]
-        public static double Kth(double ss, double n) => ss * n;
-
-        [FeatureCalculator("n", Method = CalculationMethod.FromLiteral)]
-        public static double N(int n) => 1.0 / Math.Abs(n);
-
-        [FeatureCalculator(nameof(Semantics.AbsPos))]
-        public static double AbsPos(double v, double k) => k;
-
-        [FeatureCalculator("k", Method = CalculationMethod.FromLiteral)]
-        public static double K(int k) => 1.0 / Math.Abs(k);
-
-        [FeatureCalculator(nameof(Semantics.RelPos))]
-        public static double RelPos(double x, double rr) => rr;
-
-        [FeatureCalculator("rr", Method = CalculationMethod.FromLiteral)]
-        public static double RR(Tuple<Regex, Regex> tuple) => 1;
-
-        [FeatureCalculator(nameof(Semantics.Split))]
-        public static double Split(double v, double d) => d;
+        public static double Kth(double v, double d, double n) => d * n;
 
         [FeatureCalculator("d", Method = CalculationMethod.FromLiteral)]
         public static double D(string d) => 1;
+
+        [FeatureCalculator("n", Method = CalculationMethod.FromLiteral)]
+        public static double N(int n) => 1.0 / Math.Abs(n);
     }
 }
