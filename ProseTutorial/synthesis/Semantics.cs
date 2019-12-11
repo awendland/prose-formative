@@ -9,8 +9,14 @@ using Microsoft.ProgramSynthesis.Utils;
 
 namespace ProseTutorial {
     public static class Semantics {
-        public static string Append(string prefix, string suffix) => prefix + suffix;
         public static string Substring(string v, int start, int end) => v.Substring(start, end - start);
+
+        public static string Kth(string[] ss, int k) {
+            if (k < ss.Length && k >= 0) return ss[k];
+            return null;
+        }
+
+        public static string[] Split(string v, string d) => v.Split(d);
 
         public static int? AbsPos(string v, int k) {
             return k > 0 ? k - 1 : v.Length + k + 1;

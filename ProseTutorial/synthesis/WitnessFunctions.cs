@@ -22,40 +22,7 @@ namespace ProseTutorial {
     new Regex(@"$")  // End of line
 };
 
-        [WitnessFunction(nameof(Semantics.Append), 0)]
-        public DisjunctiveExamplesSpec WitnessPrefix(GrammarRule rule, ExampleSpec spec) {
-            var result = new Dictionary<State, IEnumerable<object>>();
-
-            Console.WriteLine("[Prefix spec {0}", spec.Examples.Count);
-            foreach (var example in spec.Examples) {
-                State inputState = example.Key;
-                var output = example.Value as string;
-                // Console.WriteLine("Prefix for {0}", output);
-                var substrings = new List<string>();
-                for (int i = 1; i <= output.Length - 1; ++i) {
-                    substrings.Add(output.Substring(0, i));
-                }
-                if (substrings.Count == 0) return null;
-                result[inputState] = substrings.Cast<object>();
-                Console.WriteLine("Prefix o: {0}\tp: {1}", output, String.Join(", ", substrings));
-            }
-            return new DisjunctiveExamplesSpec(result);
-        }
-
-        [WitnessFunction(nameof(Semantics.Append), 1, DependsOnParameters = new []{0})]
-        public ExampleSpec WitnessSuffix(GrammarRule rule, ExampleSpec spec, ExampleSpec prefixSpec) {
-            var result = new Dictionary<State, object>();
-            Console.WriteLine("[Suffix spec {0} startSpec {1}", spec.Examples.Count, prefixSpec.Examples.Count);
-            foreach (var example in spec.Examples) {
-                State inputState = example.Key;
-                var output = example.Value as string;
-                // Console.WriteLine("Suffix for {0}", output);
-                var prefix = (string) prefixSpec.Examples[inputState];
-                result[inputState] = output.Substring(prefix.Length);
-                Console.WriteLine("Suffix o: {0}\tp: {1}\ts: {2}", output, prefix, output.Substring(prefix.Length));
-            }
-            return new ExampleSpec(result);
-        }
+        public static string[] UsefulDelimeters = {@",", @" ", @"", @"\t"};
 
         [WitnessFunction(nameof(Semantics.Substring), 1)]
         public DisjunctiveExamplesSpec WitnessStartPosition(GrammarRule rule, ExampleSpec spec) {
@@ -77,7 +44,6 @@ namespace ProseTutorial {
                 Console.WriteLine("Start o: {0}\ti: {1}\ts: {2}", output, input, String.Join(", ", occurrences));
             }
             return new DisjunctiveExamplesSpec(result);
-
         }
 
         [WitnessFunction(nameof(Semantics.Substring), 2, DependsOnParameters = new []{1})]
@@ -93,6 +59,74 @@ namespace ProseTutorial {
             }
             return new ExampleSpec(result);
         }
+
+        [WitnessFunction(nameof(Semantics.Split), 1)]
+        public DisjunctiveExamplesSpec WitnessDelimiter(GrammarRule rule, ExampleSpec spec) {
+            var result = new Dictionary<State, IEnumerable<object>>();
+            foreach (var example in spec.Examples) {
+                State inputState = example.Key;
+                var input = inputState[rule.Body[0]] as string;
+                var output = (string[]) example.Value;
+
+                var delimiters = new List<string>();
+                foreach (string d in UsefulDelimeters) {
+                    if (input.Split(d).Equals(d)) {
+                        delimiters.Append(d);
+                    }
+                }
+                if (delimiters.Count == 0) return null;
+                result[inputState] = delimiters.Cast<object>();
+                Console.WriteLine("Delimiter o: {0}\ti: {1}\td: {2}", output, input, String.Join(", ", delimiters));
+            }
+            return DisjunctiveExamplesSpec.From(result);
+        }
+
+        [WitnessFunction(nameof(Semantics.Kth), 1)]
+        public DisjunctiveExamplesSpec WitnessN(GrammarRule rule, ExampleSpec spec) {
+
+            var nExamples = new Dictionary<State, IEnumerable<object>>();
+            foreach (var example in spec.Examples) {
+                State inputState = example.Key;
+                var ss = inputState[rule.Body[0]] as string[]; // todo switch to actual SS
+                var s = example.Value as string;
+
+                var indexes = new List<int>();
+                for (int i = 0; i < ss.Length; i++) {
+                    if (ss[i] == s) indexes.Append(i);
+                }
+                if (indexes.Count == 0) return null;
+                nExamples[inputState] = indexes.Cast<object>();
+                Console.WriteLine("N ss: {0}\ts: {1}\ti: {2}", ss, s, String.Join(", ", indexes));
+            }
+            return DisjunctiveExamplesSpec.From(nExamples);
+        }
+
+        // https://github.com/microsoft/prose/blob/72b5e03a/ProgramSynthesis/ProseSample.TextExtraction/WitnessFunctions.cs
+        // [WitnessFunction(nameof(Semantics.Kth), 1)]
+        // public DisjunctiveExamplesSpec WitnessSS(GrammarRule rule, PrefixSpec spec) {
+        //     var ssExample = new Dictionary<State, IEnumerable<object>>();
+
+        //     foreach (var input in spec.ProvidedInputs) {
+        //         var v = (string) input[rule.Grammar.InputSymbol];
+        //         var ss = spec.PositiveExamples[input].Cast<string[]>();
+
+        //         var indexesWithStr = new List<int>();
+        //         foreach ()
+
+        //         State inputState = example.Key;
+        //         var output = example.Value as string;
+        //         var occurrences = new List<int>();
+
+        //         for (int i = input.IndexOf(output); i >= 0; i = input.IndexOf(output, i + 1)) {
+        //             occurrences.Add(i);
+        //         }
+
+        //         if (occurrences.Count == 0) return null;
+        //         result[inputState] = occurrences.Cast<object>();
+        //         Console.WriteLine("Start o: {0}\ti: {1}\ts: {2}", output, input, String.Join(", ", occurrences));
+        //     }
+        //     return new DisjunctiveExamplesSpec(result);
+        // }
 
         [WitnessFunction(nameof(Semantics.AbsPos), 1)]
         public DisjunctiveExamplesSpec WitnessK(GrammarRule rule, DisjunctiveExamplesSpec spec) {
