@@ -58,40 +58,55 @@ namespace ProseTutorial {
         }
 
         [WitnessFunction(nameof(Semantics.Substring), 1)]
-        public DisjunctiveExamplesSpec WitnessStartPosition(GrammarRule rule, ExampleSpec spec) {
+        public DisjunctiveExamplesSpec WitnessStartPosition(GrammarRule rule, DisjunctiveExamplesSpec spec) {
             var result = new Dictionary<State, IEnumerable<object>>();
 
-            Console.WriteLine("[Start spec {0}", spec.Examples.Count);
-            foreach (var example in spec.Examples) {
+            Console.WriteLine("[Start spec {0}", spec.DisjunctiveExamples.Count);
+            foreach (var example in spec.DisjunctiveExamples) {
                 State inputState = example.Key;
                 var input = inputState[rule.Body[0]] as string;
-                var output = example.Value as string;
-                var occurrences = new List<int>();
-
-                for (int i = input.IndexOf(output); i >= 0; i = input.IndexOf(output, i + 1)) {
-                    occurrences.Add(i);
+                var occurrences = new HashSet<int>();
+                foreach (string output in example.Value)
+                {
+                    for (int i = input.IndexOf(output); i >= 0; i = input.IndexOf(output, i + 1))
+                    {
+                        occurrences.Add(i);
+                    }
                 }
-
                 if (occurrences.Count == 0) return null;
-                result[inputState] = occurrences.Cast<object>();
-                Console.WriteLine("Start o: {0}\ti: {1}\ts: {2}", output, input, String.Join(", ", occurrences));
+                result[inputState] = occurrences.ToList().Cast<object>();
+                Console.WriteLine("Start o: {0}\ti: {1}\ts: {2}", String.Join(", ", example.Value), input, String.Join(", ", occurrences));
             }
             return new DisjunctiveExamplesSpec(result);
 
         }
 
         [WitnessFunction(nameof(Semantics.Substring), 2, DependsOnParameters = new []{1})]
-        public ExampleSpec WitnessEndPosition(GrammarRule rule, ExampleSpec spec, ExampleSpec startSpec) {
-            var result = new Dictionary<State, object>();
-            Console.WriteLine("[End spec {0} startSpec {1}", spec.Examples.Count, startSpec.Examples.Count);
-            foreach (var example in spec.Examples) {
+        public DisjunctiveExamplesSpec WitnessEndPosition(GrammarRule rule, DisjunctiveExamplesSpec spec, ExampleSpec startSpec) {
+            var result = new Dictionary<State, IEnumerable<object>>();
+            Console.WriteLine("[End spec {0} startSpec {1}", spec.DisjunctiveExamples.Count, startSpec.Examples.Count);
+            foreach (var example in spec.DisjunctiveExamples) {
                 State inputState = example.Key;
-                var output = example.Value as string;
-                var start = (int) startSpec.Examples[inputState];
-                result[inputState] = start + output.Length;
-                Console.WriteLine("End o: {0}\ts: {1}\te: {2}", output, start, start + output.Length);
+                var input = inputState[rule.Body[0]] as string;
+                var occurrences = new HashSet<int>();
+                var start = (int)startSpec.Examples[inputState];
+                foreach (string output in example.Value) {
+                    var i = start + output.Length;
+                    if (start < input.Length && i <= input.Length) {
+                        var r = input.Substring(start, output.Length);
+                        if (r.Equals(output)) {
+                            occurrences.Add(i);
+                        }
+                        else {
+                            Console.WriteLine("ignoring {0}, because {1}[{2}:{0}] != {3} but {4}", i, input, start, output, r);
+                        }
+                    }
+                }
+                if (occurrences.Count == 0) return null;
+                result[inputState] = occurrences.ToList().Cast<object>();
+                Console.WriteLine("End o: {0}\ts: {1}\te: {2}", String.Join(", ", example.Value), start, String.Join(", ", occurrences));
             }
-            return new ExampleSpec(result);
+            return new DisjunctiveExamplesSpec(result);
         }
 
         [WitnessFunction(nameof(Semantics.AbsPos), 1)]
